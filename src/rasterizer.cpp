@@ -65,17 +65,52 @@ namespace CGL {
     }
   }
 
+    float sign(float x1, float y1, float x2, float y2, float x3, float y3) {
+        return (x1 - x3) * (y2 - y3) - (x2 - x3) * (y1 - y3);
+    }
+
+  bool inside(float x0, float y0, float x1, float y1, float x2, float y2,
+              float x, float y) {
+      float d1, d2, d3;
+      bool has_neg, has_pos;
+
+      d1 = sign(x, y, x0, y0, x1, y1);
+      d2 = sign(x, y, x1, y1, x2, y2);
+      d3 = sign(x, y, x2, y2, x0, y0);
+
+      has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+      has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+      return !(has_neg && has_pos);
+  }
+
   // Rasterize a triangle.
   void RasterizerImp::rasterize_triangle(float x0, float y0,
     float x1, float y1,
     float x2, float y2,
     Color color) {
     // TODO: Task 1: Implement basic triangle rasterization here, no supersampling
-
+    int xmax = (int) max(max(x0, x1), x2);
+    int ymax = (int) max(max(y0, y1), y2);
+    float image[xmax][ymax];
+    for (int x = 0; x < xmax; x++) {
+        for (int y = 0; y < ymax; y++) {
+            image[x][y] = inside(x + .5, y + .5, x0, y0, x1, y1, x2, y2);
+        }
+    }
     // TODO: Task 2: Update to implement super-sampled rasterization
+    for (int i = 0; i < xmax; i++) {
+        for (int j = 0; j < ymax; j++) {
+            // fill in the nearest pixel
+            int sx = (int)floor(i);
+            int sy = (int)floor(j);
 
-
-
+            // check bounds
+            if (sx >= 0 && sx < xmax && sy >= 0 && sy < ymax) {
+                fill_pixel(sx, sy, color);
+            }
+        }
+    }
   }
 
 
