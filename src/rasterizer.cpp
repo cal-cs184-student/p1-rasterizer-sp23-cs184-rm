@@ -66,17 +66,17 @@ namespace CGL {
   }
 
   // determines if the point is inside the triange
-  bool pointinside(float x, float y, float x0, float y0, float x1, float y1, float x2, float y2) {
+  int pointinside(float x, float y, float x0, float y0, float x1, float y1, float x2, float y2) {
       float L0 = -1 * (x - x0) * (y1 - y0) + (y - y0) * (x1 - x0);
       float L1 = -1 * (x - x1) * (y2 - y1) + (y - y1) * (x2 - x1);
       float L2 = -1 * (x - x2) * (y0 - y2) + (y - y2) * (x0 - x2);
       
       if ((L0 > 0) && (L1 > 0) && (L2 > 0)) {
-          return true;
+          return 1;
       } else if ((L0 < 0) && (L1 < 0) && (L2 < 0)) {
-          return true;
+          return 1;
       }
-      return false;
+      return 0;
   }
 
   // Rasterize a triangle.
@@ -93,7 +93,7 @@ namespace CGL {
     for (int x = xmin; x < xmax; x++) {
         for (int y = ymin; y < ymax; y++) {
 //            fill_pixel(x, y, color);
-            if (pointinside(x + .5, y + .5, x0, y0, x1, y1, x2, y2)) {
+            if (pointinside(x + .5, y + .5, x0, y0, x1, y1, x2, y2) == 1) {
                 fill_pixel(x, y, color);
             }
         }
@@ -102,6 +102,33 @@ namespace CGL {
 //    rasterize_line(x0, x0, x2, y2, color);
 //    rasterize_line(x1, y1, x2, y2, color);
     // TODO: Task 2: Update to implement super-sampled rasterization
+      
+//      set_sample_rate(4);
+//      sample_rate = sqrt(sample_rate) * sqrt(sample_rate);
+//      set_framebuffer_target(rgb_framebuffer_target, width * sample_rate, height * sample_rate);
+      
+      xmin = xmin * sample_rate;
+      xmax = xmax * sample_rate;
+      ymin = ymin * sample_rate;
+      ymax = ymax * sample_rate;
+      
+      float pixelsFilled = 0;
+      set_sample_rate(4);
+      for (int x = xmin; x < xmax; x++) {
+          for (int y = ymin; y < ymax; y++) {
+              pixelsFilled += pointinside(x + .5, y + .5, x0, y0, x1, y1, x2, y2);
+//              Color newcolor = color;
+//              if (pixelsFilled != 0) {
+//                  pixelsFilled = (pixelsFilled / 4.0);
+//                  newcolor = pixelsFilled * color;
+//                  fill_pixel(x, y, newcolor);
+//              }
+//              pixelsFilled = 0;
+          }
+      }
+      
+      
+//      resolve_to_framebuffer();
   }
 
 
