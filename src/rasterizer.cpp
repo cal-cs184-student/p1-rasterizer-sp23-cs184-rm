@@ -138,7 +138,25 @@ namespace CGL {
   {
     // TODO: Task 4: Rasterize the triangle, calculating barycentric coordinates and using them to interpolate vertex colors across the triangle
     // Hint: You can reuse code from rasterize_triangle
-
+      int xmax = (int) max(max(x0, x1), x2);
+      int xmin = (int) min(min(x0, x1), x2);
+      int ymax = (int) max(max(y0, y1), y2);
+      int ymin = (int) min(min(y0, y1), y2);
+  //    int image[xmax][ymax];
+      for (int x = xmin; x < xmax; x++) {
+          for (int y = ymin; y < ymax; y++) {
+  //            fill_pixel(x, y, color);
+              if (pointinside(x + .5, y + .5, x0, y0, x1, y1, x2, y2) == 1) {
+                  float alpha = (-(x - x1) * (y2 - y1) + (y - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
+                  float beta = (-(x - x2) * (y0 - y2) + (y - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
+                  float gamma = 1 - alpha - beta;
+                  float red = alpha * c0.r + beta * c1.r + gamma * c2.r;
+                  float green = alpha * c0.g + beta * c1.g + gamma * c2.g;
+                  float blue = alpha * c0.b + beta * c1.b + gamma * c2.b;
+                  fill_pixel(x, y, Color(red, green, blue));
+              }
+          }
+      }
 
 
   }
@@ -150,6 +168,9 @@ namespace CGL {
     Texture& tex)
   {
     // TODO: Task 5: Fill in the SampleParams struct and pass it to the tex.sample function.
+      
+      
+      
     // TODO: Task 6: Set the correct barycentric differentials in the SampleParams struct.
     // Hint: You can reuse code from rasterize_triangle/rasterize_interpolated_color_triangle
 
