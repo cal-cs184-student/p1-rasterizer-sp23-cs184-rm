@@ -66,18 +66,17 @@ namespace CGL {
   }
 
   // determines if the point is inside the triange
-  int pointinside(float x0, float y0, float x1, float y1, float x2, float y2,
-              float x, float y) {
+  bool pointinside(float x, float y, float x0, float y0, float x1, float y1, float x2, float y2) {
       float L0 = -1 * (x - x0) * (y1 - y0) + (y - y0) * (x1 - x0);
       float L1 = -1 * (x - x1) * (y2 - y1) + (y - y1) * (x2 - x1);
       float L2 = -1 * (x - x2) * (y0 - y2) + (y - y2) * (x0 - x2);
       
-      if (L0 > 0 && L1 > 0 && L2 > 0) {
-          return 1;
-      } else if (L0 < 0 && L1 < 0 && L2 < 0) {
-          return 1;
+      if ((L0 > 0) && (L1 > 0) && (L2 > 0)) {
+          return true;
+      } else if ((L0 < 0) && (L1 < 0) && (L2 < 0)) {
+          return true;
       }
-      return 0;
+      return false;
   }
 
   // Rasterize a triangle.
@@ -90,22 +89,15 @@ namespace CGL {
     int xmin = (int) min(min(x0, x1), x2);
     int ymax = (int) max(max(y0, y1), y2);
     int ymin = (int) min(min(y0, y1), y2);
-    int image[xmax][ymax];
+//    int image[xmax][ymax];
     for (int x = xmin; x < xmax; x++) {
         for (int y = ymin; y < ymax; y++) {
-            if (pointinside(x + .5, y + .5, x0, y0, x1, y1, x2, y2) == 1) {
+//            fill_pixel(x, y, color);
+            if (pointinside(x + .5, y + .5, x0, y0, x1, y1, x2, y2)) {
                 fill_pixel(x, y, color);
             }
         }
     }
-//    for (int i = 0; i < xmax; i++) {
-//        for (int j = 0; j < ymax; j++) {
-//            // fill in the nearest pixel
-//            if (image[i][j] == 1) {
-//                fill_pixel(i, j, color);
-//            }
-//        }
-//    }
 //    rasterize_line(x0, y0, x1, y1, color);
 //    rasterize_line(x0, x0, x2, y2, color);
 //    rasterize_line(x1, y1, x2, y2, color);
