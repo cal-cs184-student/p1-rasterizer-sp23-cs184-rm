@@ -156,7 +156,6 @@ namespace CGL {
     // TODO: Task 5: Fill in the SampleParams struct and pass it to the tex.sample function.
       
       
-      
     // TODO: Task 6: Set the correct barycentric differentials in the SampleParams struct.
     // Hint: You can reuse code from rasterize_triangle/rasterize_interpolated_color_triangle
 
