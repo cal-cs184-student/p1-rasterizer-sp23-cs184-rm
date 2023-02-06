@@ -154,7 +154,19 @@ namespace CGL {
     Texture& tex)
   {
     // TODO: Task 5: Fill in the SampleParams struct and pass it to the tex.sample function.
-      
+      int xmax = (int) max(max(x0, x1), x2);
+      int xmin = (int) min(min(x0, x1), x2);
+      int ymax = (int) max(max(y0, y1), y2);
+      int ymin = (int) min(min(y0, y1), y2);
+      for (int x = xmin; x < xmax; x++) {
+          for (int y = ymin; y < ymax; y++) {
+              SampleParams sp;
+              sp.lsm = lsm;
+              sp.psm = psm;
+              sp.p_uv = Vector2D(u0 / width, v0 / height);
+              Color col = tex.sample(sp);
+          }
+      }
       
     // TODO: Task 6: Set the correct barycentric differentials in the SampleParams struct.
     // Hint: You can reuse code from rasterize_triangle/rasterize_interpolated_color_triangle
