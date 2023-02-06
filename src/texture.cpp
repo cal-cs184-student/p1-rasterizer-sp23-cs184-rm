@@ -29,52 +29,35 @@ namespace CGL {
   Color Texture::sample_nearest(Vector2D uv, int level) {
     // TODO: Task 5: Fill this in.
     auto& mip = mipmap[level];
-      uv.x = (int) uv.x;
-      uv.y = (int) uv.y;
       if (level > 7 || level < 0) {
           // return magenta for invalid level
           return Color(1, 0, 1);
       }
-      MipLevel m;
-      return m.get_texel(uv.x, uv.y);
+      return mip.get_texel(round(uv.x * width), round(uv.y * height));
   }
 
   Color Texture::sample_bilinear(Vector2D uv, int level) {
-    // TODO: Task 5: Fill this in.
-    auto& mip = mipmap[level];
-      int x = (int) uv.x;
-      int x1;
-      int x2;
-      int y1;
-      int y2;
-      if (uv.x - x > .5) {
-          x1 = x;
-          x2 = x1 + 1;
-      } else {
-          x2 = x;
-          x1 = x2 - 1;
+      // TODO: Task 5: Fill this in.
+      auto& mip = mipmap[level];
+      if (level > 7 || level < 0) {
+          // return magenta for invalid level
+          return Color(1, 0, 1);
       }
-      int y = (int) uv.y;
-      if (uv.y - y > .5) {
-          y1 = y;
-          y2 = y1 + 1;
-      } else {
-          y2 = y;
-          y1 = y2 - 1;
-      }
-      MipLevel m;
-      Color u00 = m.get_texel(x1, y1);
-      Color u01 = m.get_texel(x1, y2);
-      Color u10 = m.get_texel(x2, y1);
-      Color u11 = m.get_texel(x2, y2);
-      double s = uv.x - x1 + .5;
-      double t = uv.y - y1 + .5;
-//      Color u0 = u00 + s(u10.subtract(u00));
-//      Color u1 = u01 + s(u11 - u01);
-//      Color f = u0 + t(u1 - u0);
-
-    // return magenta for invalid level
-    return Color(1, 0, 1);
+      int x1 = floor(uv.x * width);
+      int x2 = ceil(uv.x * width);
+      int y1 = floor(uv.y * height);
+      int y2 = ceil(uv.y * height);
+      float s = (uv.x * width) - uv.x;
+      float sm = 1 - s;
+      float t = (uv.y * height) - uv.y;
+      float tm = 1 - t;
+      Color a = mip.get_texel(x1, y1);
+      Color b = mip.get_texel(x2, y1);
+      Color c = mip.get_texel(x1, y2);
+      Color d = mip.get_texel(x2, y2);
+      Color e = Color (a.r * s + b.r * sm, a.g * s + b.g * sm, a.b * s + b.b * sm);
+      Color f = Color (c.r * s + d.r * sm, c.g * s + d.g * sm, c.b * s + d.b * sm);
+      return Color (e.r * t + f.r * tm, e.g * t + f.g * tm, e.b * t + f.b * tm);
   }
 
 
