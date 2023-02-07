@@ -89,13 +89,13 @@ namespace CGL {
     int xmin = (int) min(min(x0, x1), x2);
     int ymax = (int) max(max(y0, y1), y2);
     int ymin = (int) min(min(y0, y1), y2);
-    for (int x = xmin; x < xmax; x++) {
-        for (int y = ymin; y < ymax; y++) {
-            if (pointinside(x + .5, y + .5, x0, y0, x1, y1, x2, y2) == 1) {
-                fill_pixel(x, y, color);
-            }
-        }
-    }
+//    for (int x = xmin; x < xmax; x++) {
+//        for (int y = ymin; y < ymax; y++) {
+//            if (pointinside(x + .5, y + .5, x0, y0, x1, y1, x2, y2) == 1) {
+//                fill_pixel(x, y, color);
+//            }
+//        }
+//    }
     // TODO: Task 2: Update to implement super-sampled rasterization
       
       int srs = (int) sqrt(sample_rate);
@@ -154,6 +154,8 @@ namespace CGL {
     Texture& tex)
   {
     // TODO: Task 5: Fill in the SampleParams struct and pass it to the tex.sample function.
+    // TODO: Task 6: Set the correct barycentric differentials in the SampleParams struct.
+    // Hint: You can reuse code from rasterize_triangle/rasterize_interpolated_color_triangle
       int xmax = (int) max(max(x0, x1), x2);
       int xmin = (int) min(min(x0, x1), x2);
       int ymax = (int) max(max(y0, y1), y2);
@@ -168,8 +170,6 @@ namespace CGL {
           }
       }
       
-    // TODO: Task 6: Set the correct barycentric differentials in the SampleParams struct.
-    // Hint: You can reuse code from rasterize_triangle/rasterize_interpolated_color_triangle
 
 
 
@@ -179,11 +179,10 @@ namespace CGL {
   void RasterizerImp::set_sample_rate(unsigned int rate) {
     // TODO: Task 2: You may want to update this function for supersampling support
 
-    this->sample_rate = sqrt(sample_rate) * sqrt(sample_rate);
-;
+    this->sample_rate = sqrt(rate) * sqrt(rate);
 
 
-    this->sample_buffer.resize(width * height * sample_rate, Color::White);
+    this->sample_buffer.resize(width * height * rate, Color::White);
   }
 
 
@@ -214,12 +213,15 @@ namespace CGL {
   //
   void RasterizerImp::resolve_to_framebuffer() {
     // TODO: Task 2: You will likely want to update this function for supersampling support
-
+      
+      cout << sample_rate << "\n";
+      cout << width * height << "\n";
     float srs = sqrt(sample_rate);
     float s_width = width * srs;
     float red = 0;
     float blue = 0;
     float green = 0;
+;
     for (int x = 0; x < width; ++x) {
       for (int y = 0; y < height; ++y) {
 //        Color col = sample_buffer[y * width + x];
@@ -236,9 +238,9 @@ namespace CGL {
           green = green / sample_rate;
           Color col = Color(red, blue, green);
 
-        for (int k = 0; k < 3; ++k) {
-          this->rgb_framebuffer_target[3 * (y * width + x) + k] = (&col.r)[k] * 255;
-        }
+          for (int k = 0; k < 3; ++k) {
+            this->rgb_framebuffer_target[3 * (y * width + x) + k] = (&col.r)[k] * 255;
+          }
           red = 0;
           blue = 0;
           green = 0;
