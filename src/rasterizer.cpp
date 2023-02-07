@@ -214,8 +214,6 @@ namespace CGL {
   void RasterizerImp::resolve_to_framebuffer() {
     // TODO: Task 2: You will likely want to update this function for supersampling support
       
-      cout << sample_rate << "\n";
-      cout << width * height << "\n";
     float srs = sqrt(sample_rate);
     float s_width = width * srs;
     float red = 0;
