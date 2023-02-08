@@ -156,19 +156,20 @@ namespace CGL {
     // TODO: Task 5: Fill in the SampleParams struct and pass it to the tex.sample function.
     // TODO: Task 6: Set the correct barycentric differentials in the SampleParams struct.
     // Hint: You can reuse code from rasterize_triangle/rasterize_interpolated_color_triangle
-      int xmax = (int) max(max(x0, x1), x2);
-      int xmin = (int) min(min(x0, x1), x2);
-      int ymax = (int) max(max(y0, y1), y2);
-      int ymin = (int) min(min(y0, y1), y2);
-      for (int x = xmin; x < xmax; x++) {
-          for (int y = ymin; y < ymax; y++) {
-              SampleParams sp;
-              sp.lsm = lsm;
-              sp.psm = psm;
-              sp.p_uv = Vector2D(u0 / width, v0 / height);
-              Color col = tex.sample(sp);
-          }
-      }
+      SampleParams sp;
+      sp.lsm = lsm;
+      sp.psm = psm;
+      sp.p_uv = Vector2D((u0 + u1 + u2)/ 3, (v0 + v1 + v2) / 3);
+      Color col = tex.sample(sp);
+      
+//      int xmax = (int) max(max(x0, x1), x2);
+//      int xmin = (int) min(min(x0, x1), x2);
+//      int ymax = (int) max(max(y0, y1), y2);
+//      int ymin = (int) min(min(y0, y1), y2);
+//      for (int x = xmin; x < xmax; x++) {
+//          for (int y = ymin; y < ymax; y++) {
+//          }
+//      }
       
 
 

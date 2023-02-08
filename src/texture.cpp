@@ -8,10 +8,12 @@ namespace CGL {
 
   Color Texture::sample(const SampleParams& sp) {
     // TODO: Task 6: Fill this in.
+//      float level = get_level(sp);
+      float level = 1;
       if (sp.psm == P_NEAREST) {
-          return sample_nearest(sp.p_uv);
+          return sample_nearest(sp.p_uv, level);
       } else if (sp.psm == P_LINEAR) {
-          return sample_bilinear(sp.p_uv);
+          return sample_bilinear(sp.p_uv, level);
       }
 
 // return magenta for invalid level
@@ -20,10 +22,11 @@ namespace CGL {
 
   float Texture::get_level(const SampleParams& sp) {
     // TODO: Task 6: Fill this in.
-
-
-
-    return 0;
+      float val1 = sqrt(pow(sp.p_dx_uv[0], 2) + pow(sp.p_dx_uv[1], 2));
+      float val2 = sqrt(pow(sp.p_dy_uv[0], 2) + pow(sp.p_dy_uv[1], 2));
+      float L = max(val1, val2);
+      float D = log(L) / log(2);
+      return D;
   }
 
   Color MipLevel::get_texel(int tx, int ty) {
