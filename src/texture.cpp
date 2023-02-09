@@ -8,8 +8,7 @@ namespace CGL {
 
   Color Texture::sample(const SampleParams& sp) {
     // TODO: Task 6: Fill this in.
-//      float level = get_level(sp);
-      float level = 1;
+      float level = get_level(sp);
       if (sp.psm == P_NEAREST) {
           return sample_nearest(sp.p_uv, level);
       } else if (sp.psm == P_LINEAR) {
@@ -22,6 +21,9 @@ namespace CGL {
 
   float Texture::get_level(const SampleParams& sp) {
     // TODO: Task 6: Fill this in.
+      if (sp.p_dx_uv[0] == 0 && sp.p_dx_uv[1] == 0) {
+          return 0;
+      }
       float val1 = sqrt(pow(sp.p_dx_uv[0], 2) + pow(sp.p_dx_uv[1], 2));
       float val2 = sqrt(pow(sp.p_dy_uv[0], 2) + pow(sp.p_dy_uv[1], 2));
       float L = max(val1, val2);
@@ -40,7 +42,7 @@ namespace CGL {
           // return magenta for invalid level
           return Color(1, 0, 1);
       }
-      return mip.get_texel(round(uv.x * width), round(uv.y * height));
+      return mip.get_texel(round(uv.x * mip.width), round(uv.y * mip.height));
   }
 
   Color Texture::sample_bilinear(Vector2D uv, int level) {
@@ -50,21 +52,25 @@ namespace CGL {
           // return magenta for invalid level
           return Color(1, 0, 1);
       }
-      int x1 = floor(uv.x * width);
-      int x2 = ceil(uv.x * width);
-      int y1 = floor(uv.y * height);
-      int y2 = ceil(uv.y * height);
-      float s = (uv.x * width) - uv.x;
+      float x1 = floor(uv.x * mip.width);
+      float x2 = ceil(uv.x * mip.width);
+      float y1 = floor(uv.y * mip.height);
+      float y2 = ceil(uv.y * mip.height);
+      float s = (uv.x * mip.width) - x1;
       float sm = 1 - s;
-      float t = (uv.y * height) - uv.y;
+      float t = (uv.y * mip.height) - y1;
       float tm = 1 - t;
       Color a = mip.get_texel(x1, y1);
       Color b = mip.get_texel(x2, y1);
       Color c = mip.get_texel(x1, y2);
       Color d = mip.get_texel(x2, y2);
-      Color e = Color (a.r * s + b.r * sm, a.g * s + b.g * sm, a.b * s + b.b * sm);
-      Color f = Color (c.r * s + d.r * sm, c.g * s + d.g * sm, c.b * s + d.b * sm);
-      return Color (e.r * t + f.r * tm, e.g * t + f.g * tm, e.b * t + f.b * tm);
+      Color e = Color (a.r * sm + b.r * s, a.g * sm + b.g * s, a.b * sm + b.b * s);
+      Color f = Color (c.r * sm + d.r * s, c.g * sm + d.g * s, c.b * sm + d.b * s);
+      return Color (e.r * tm + f.r * t, e.g * tm + f.g * t, e.b * tm + f.b * t);
+//      Color e = a + s * (b + (-1 * a));
+//      Color f = c + s * (d + (-1 * c));
+//      Color p = e + t * (f + (-1 * e));
+//      return p;
   }
 
 

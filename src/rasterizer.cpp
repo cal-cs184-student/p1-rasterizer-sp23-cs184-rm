@@ -118,24 +118,13 @@ namespace CGL {
               float green = 0;
               for (int i = 0; i < srs; i++) {
                   for (int j = 0; j < srs; j++) {
-//                      xpix = x + ((i + 1.0) / srs + i*1.0 / srs) / 2;
                       xpix = x + (i+0.5)/srs;
-//                      ypix = y + ((j + 1.0) / srs + j*1.0 / srs) / 2;
                       ypix = y + (j+0.5)/srs;
                       if (pointinside(xpix, ypix, x0, y0, x1, y1, x2, y2) == 1) {
                           fill_pixel(srs * x + i, srs * y + j, color);
-//                          sample_buffer[] = color;
-//                          red += color.r;
-//                          blue += color.b;
-//                          green += color.g;
                       }
                   }
               }
-//              red = red / sample_rate;
-//              blue = blue / sample_rate;
-//              green = green / sample_rate;
-//              Color col = Color(red, blue, green);
-//              fill_pixel(x, y, col);
           }
       }
   }
@@ -151,18 +140,42 @@ namespace CGL {
       int xmin = (int) min(min(x0, x1), x2);
       int ymax = (int) max(max(y0, y1), y2);
       int ymin = (int) min(min(y0, y1), y2);
-  //    int image[xmax][ymax];
+//      for (int x = xmin; x < xmax; x++) {
+//          for (int y = ymin; y < ymax; y++) {
+//              if (pointinside(x + .5, y + .5, x0, y0, x1, y1, x2, y2) == 1) {
+//                  float alpha = (-(x - x1) * (y2 - y1) + (y - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
+//                  float beta = (-(x - x2) * (y0 - y2) + (y - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
+//                  float gamma = 1 - alpha - beta;
+//                  float red = alpha * c0.r + beta * c1.r + gamma * c2.r;
+//                  float green = alpha * c0.g + beta * c1.g + gamma * c2.g;
+//                  float blue = alpha * c0.b + beta * c1.b + gamma * c2.b;
+//                  fill_pixel(x, y, Color(red, green, blue));
+//              }
+//          }
+//      }
+      int srs = (int) sqrt(sample_rate);
+      float xpix;
+      float ypix;
+      float s_width = width * srs;
       for (int x = xmin; x < xmax; x++) {
           for (int y = ymin; y < ymax; y++) {
-  //            fill_pixel(x, y, color);
-              if (pointinside(x + .5, y + .5, x0, y0, x1, y1, x2, y2) == 1) {
-                  float alpha = (-(x - x1) * (y2 - y1) + (y - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
-                  float beta = (-(x - x2) * (y0 - y2) + (y - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
-                  float gamma = 1 - alpha - beta;
-                  float red = alpha * c0.r + beta * c1.r + gamma * c2.r;
-                  float green = alpha * c0.g + beta * c1.g + gamma * c2.g;
-                  float blue = alpha * c0.b + beta * c1.b + gamma * c2.b;
-                  fill_pixel(x, y, Color(red, green, blue));
+              float red = 0;
+              float blue = 0;
+              float green = 0;
+              for (int i = 0; i < srs; i++) {
+                  for (int j = 0; j < srs; j++) {
+                      xpix = x + (i+0.5)/srs;
+                      ypix = y + (j+0.5)/srs;
+                      if (pointinside(xpix, ypix, x0, y0, x1, y1, x2, y2) == 1) {
+                          float alpha = (-(xpix - x1) * (y2 - y1) + (ypix - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
+                          float beta = (-(xpix - x2) * (y0 - y2) + (ypix - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
+                          float gamma = 1 - alpha - beta;
+                          float red = alpha * c0.r + beta * c1.r + gamma * c2.r;
+                          float green = alpha * c0.g + beta * c1.g + gamma * c2.g;
+                          float blue = alpha * c0.b + beta * c1.b + gamma * c2.b;
+                          fill_pixel(srs * x + i, srs * y + j, Color(red, green, blue));
+                      }
+                  }
               }
           }
       }
@@ -179,21 +192,57 @@ namespace CGL {
     // TODO: Task 5: Fill in the SampleParams struct and pass it to the tex.sample function.
     // TODO: Task 6: Set the correct barycentric differentials in the SampleParams struct.
     // Hint: You can reuse code from rasterize_triangle/rasterize_interpolated_color_triangle
-      SampleParams sp;
-      sp.lsm = lsm;
-      sp.psm = psm;
-      sp.p_uv = Vector2D((u0 + u1 + u2)/ 3, (v0 + v1 + v2) / 3);
-      Color col = tex.sample(sp);
+      SampleParams sp0;
+      sp0.lsm = lsm;
+      sp0.psm = psm;
+      sp0.p_uv = Vector2D(u0, v0);
+      sp0.p_dx_uv = Vector2D(0, 0);
+      Color c0 = tex.sample(sp0);
       
-//      int xmax = (int) max(max(x0, x1), x2);
-//      int xmin = (int) min(min(x0, x1), x2);
-//      int ymax = (int) max(max(y0, y1), y2);
-//      int ymin = (int) min(min(y0, y1), y2);
-//      for (int x = xmin; x < xmax; x++) {
-//          for (int y = ymin; y < ymax; y++) {
-//          }
-//      }
+      SampleParams sp1;
+      sp1.lsm = lsm;
+      sp1.psm = psm;
+      sp1.p_uv = Vector2D(u1, v1);
+      sp1.p_dx_uv = Vector2D(0, 0);
+      Color c1 = tex.sample(sp1);
       
+      SampleParams sp2;
+      sp2.lsm = lsm;
+      sp2.psm = psm;
+      sp2.p_uv = Vector2D(u2, v2);
+      sp2.p_dx_uv = Vector2D(0, 0);
+      Color c2 = tex.sample(sp2);
+      
+      int xmax = (int) max(max(x0, x1), x2);
+      int xmin = (int) min(min(x0, x1), x2);
+      int ymax = (int) max(max(y0, y1), y2);
+      int ymin = (int) min(min(y0, y1), y2);
+      float srs = floor(sqrt(sample_rate));
+      float xpix;
+      float ypix;
+      float s_width = width * srs;
+      for (int x = xmin; x < xmax; x++) {
+          for (int y = ymin; y < ymax; y++) {
+              float red = 0;
+              float blue = 0;
+              float green = 0;
+              for (int i = 0; i < srs; i++) {
+                  for (int j = 0; j < srs; j++) {
+                      xpix = x + (i+0.5)/srs;
+                      ypix = y + (j+0.5)/srs;
+                      if (pointinside(xpix, ypix, x0, y0, x1, y1, x2, y2) == 1) {
+                          float alpha = (-(xpix - x1) * (y2 - y1) + (ypix - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
+                          float beta = (-(xpix - x2) * (y0 - y2) + (ypix - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
+                          float gamma = 1 - alpha - beta;
+                          float red = alpha * c0.r + beta * c1.r + gamma * c2.r;
+                          float green = alpha * c0.g + beta * c1.g + gamma * c2.g;
+                          float blue = alpha * c0.b + beta * c1.b + gamma * c2.b;
+                          fill_pixel(srs * x + i, srs * y + j, Color(red, green, blue));
+                      }
+                  }
+              }
+          }
+      }
 
 
 
