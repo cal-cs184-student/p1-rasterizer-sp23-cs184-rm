@@ -23,6 +23,7 @@ namespace CGL {
     // It is sufficient to use the same color for all supersamples of a pixel for points and lines (not triangles)
       
     int s_width = width * (sqrt(sample_rate));
+//    for
     sample_buffer[y * s_width + x] = c;
   }
 
@@ -37,8 +38,16 @@ namespace CGL {
     // check bounds
     if (sx < 0 || sx >= width) return;
     if (sy < 0 || sy >= height) return;
+    int srs = sqrt(this->sample_rate);
+      for (int i = 0; i < srs; i++) {
+          for (int j = 0; j < srs; j++) {
+//              int xpix = x + (i+0.5)/srs;
+//              int ypix = y + (j+0.5)/srs;
+              fill_pixel(sx * srs + i, sy * srs + j, color);
+          }
+      }
 
-    fill_pixel(sx, sy, color);
+//    fill_pixel(sx, sy, color);
     return;
   }
 
@@ -104,15 +113,29 @@ namespace CGL {
       float s_width = width * srs;
       for (int x = xmin; x < xmax; x++) {
           for (int y = ymin; y < ymax; y++) {
+              float red = 0;
+              float blue = 0;
+              float green = 0;
               for (int i = 0; i < srs; i++) {
                   for (int j = 0; j < srs; j++) {
-                      xpix = x + ((i + 1) / srs + i / srs) / 2;
-                      ypix = y + ((j + 1) / srs + j / srs) / 2;
+//                      xpix = x + ((i + 1.0) / srs + i*1.0 / srs) / 2;
+                      xpix = x + (i+0.5)/srs;
+//                      ypix = y + ((j + 1.0) / srs + j*1.0 / srs) / 2;
+                      ypix = y + (j+0.5)/srs;
                       if (pointinside(xpix, ypix, x0, y0, x1, y1, x2, y2) == 1) {
                           fill_pixel(srs * x + i, srs * y + j, color);
+//                          sample_buffer[] = color;
+//                          red += color.r;
+//                          blue += color.b;
+//                          green += color.g;
                       }
                   }
               }
+//              red = red / sample_rate;
+//              blue = blue / sample_rate;
+//              green = green / sample_rate;
+//              Color col = Color(red, blue, green);
+//              fill_pixel(x, y, col);
           }
       }
   }
@@ -183,7 +206,7 @@ namespace CGL {
     this->sample_rate = sqrt(rate) * sqrt(rate);
 
 
-    this->sample_buffer.resize(width * height * rate, Color::White);
+    this->sample_buffer.resize(width * height * this->sample_rate);
   }
 
 
@@ -197,7 +220,7 @@ namespace CGL {
     this->rgb_framebuffer_target = rgb_framebuffer;
 
 
-    this->sample_buffer.resize(width * height * sample_rate, Color::White);
+    this->sample_buffer.resize(width * height * this->sample_rate, Color::White);
   }
 
 
@@ -220,29 +243,24 @@ namespace CGL {
     float red = 0;
     float blue = 0;
     float green = 0;
-;
+
     for (int x = 0; x < width; ++x) {
       for (int y = 0; y < height; ++y) {
-//        Color col = sample_buffer[y * width + x];
+          Color col = Color(0, 0, 0);
           for (int i = 0; i < srs; i++) {
               for (int j = 0; j < srs; j++) {
                   Color c = sample_buffer[(srs * y + j) * s_width + (srs * x + i)];
-                  red += c.r;
-                  blue += c.b;
-                  green += c.g;
+                  col += c;
               }
           }
-          red = red / sample_rate;
-          blue = blue / sample_rate;
-          green = green / sample_rate;
-          Color col = Color(red, blue, green);
+          col *= 1./sample_rate;
 
           for (int k = 0; k < 3; ++k) {
-            this->rgb_framebuffer_target[3 * (y * width + x) + k] = (&col.r)[k] * 255;
+            this->rgb_framebuffer_target[3 * (y * width + x) + k] = (&col.r)[k] * 255.;
           }
-          red = 0;
-          blue = 0;
-          green = 0;
+//          red = 0;
+//          blue = 0;
+//          green = 0;
       }
     }
 
