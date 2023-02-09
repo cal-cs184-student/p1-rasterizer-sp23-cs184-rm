@@ -42,7 +42,7 @@ namespace CGL {
           // return magenta for invalid level
           return Color(1, 0, 1);
       }
-      return mip.get_texel(round(uv.x * mip.width), round(uv.y * mip.height));
+      return mip.get_texel(round(uv.x * (mip.width - 1)), round(uv.y * (mip.height - 1)));
   }
 
   Color Texture::sample_bilinear(Vector2D uv, int level) {
@@ -52,13 +52,13 @@ namespace CGL {
           // return magenta for invalid level
           return Color(1, 0, 1);
       }
-      float x1 = floor(uv.x * mip.width);
-      float x2 = ceil(uv.x * mip.width);
-      float y1 = floor(uv.y * mip.height);
-      float y2 = ceil(uv.y * mip.height);
-      float s = (uv.x * mip.width) - x1;
+      float x1 = floor(uv.x * (mip.width - 1));
+      float x2 = ceil(uv.x * (mip.width - 1));
+      float y1 = floor(uv.y * (mip.height - 1));
+      float y2 = ceil(uv.y * (mip.height - 1));
+      float s = (uv.x * (mip.width - 1)) - x1;
       float sm = 1 - s;
-      float t = (uv.y * mip.height) - y1;
+      float t = (uv.y * (mip.height - 1)) - y1;
       float tm = 1 - t;
       Color a = mip.get_texel(x1, y1);
       Color b = mip.get_texel(x2, y1);

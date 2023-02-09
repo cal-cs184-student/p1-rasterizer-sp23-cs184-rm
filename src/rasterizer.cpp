@@ -192,26 +192,12 @@ namespace CGL {
     // TODO: Task 5: Fill in the SampleParams struct and pass it to the tex.sample function.
     // TODO: Task 6: Set the correct barycentric differentials in the SampleParams struct.
     // Hint: You can reuse code from rasterize_triangle/rasterize_interpolated_color_triangle
-      SampleParams sp0;
-      sp0.lsm = lsm;
-      sp0.psm = psm;
-      sp0.p_uv = Vector2D(u0, v0);
-      sp0.p_dx_uv = Vector2D(0, 0);
-      Color c0 = tex.sample(sp0);
       
-      SampleParams sp1;
-      sp1.lsm = lsm;
-      sp1.psm = psm;
-      sp1.p_uv = Vector2D(u1, v1);
-      sp1.p_dx_uv = Vector2D(0, 0);
-      Color c1 = tex.sample(sp1);
-      
-      SampleParams sp2;
-      sp2.lsm = lsm;
-      sp2.psm = psm;
-      sp2.p_uv = Vector2D(u2, v2);
-      sp2.p_dx_uv = Vector2D(0, 0);
-      Color c2 = tex.sample(sp2);
+        SampleParams sp;
+        sp.lsm = lsm;
+        sp.psm = psm;
+        sp.p_dx_uv = Vector2D(0, 0);
+        Color c;
       
       int xmax = (int) max(max(x0, x1), x2);
       int xmin = (int) min(min(x0, x1), x2);
@@ -234,10 +220,11 @@ namespace CGL {
                           float alpha = (-(xpix - x1) * (y2 - y1) + (ypix - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
                           float beta = (-(xpix - x2) * (y0 - y2) + (ypix - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
                           float gamma = 1 - alpha - beta;
-                          float red = alpha * c0.r + beta * c1.r + gamma * c2.r;
-                          float green = alpha * c0.g + beta * c1.g + gamma * c2.g;
-                          float blue = alpha * c0.b + beta * c1.b + gamma * c2.b;
-                          fill_pixel(srs * x + i, srs * y + j, Color(red, green, blue));
+                          float u = alpha * u0 + beta * u1 + gamma * u2;
+                          float v = alpha * v0 + beta * v1 + gamma * v2;
+                          sp.p_uv = Vector2D(u, v);
+                          c = tex.sample(sp);
+                          fill_pixel(srs * x + i, srs * y + j, c);
                       }
                   }
               }
