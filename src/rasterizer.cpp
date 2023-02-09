@@ -223,6 +223,21 @@ namespace CGL {
                           float u = alpha * u0 + beta * u1 + gamma * u2;
                           float v = alpha * v0 + beta * v1 + gamma * v2;
                           sp.p_uv = Vector2D(u, v);
+                          
+                          alpha = (-((xpix + 1. / srs) - x1) * (y2 - y1) + (ypix - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
+                          beta = (-((xpix + 1. / srs) - x2) * (y0 - y2) + (ypix - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
+                          gamma = 1 - alpha - beta;
+                          u = alpha * u0 + beta * u1 + gamma * u2;
+                          v = alpha * v0 + beta * v1 + gamma * v2;
+                          sp.p_dx_uv = Vector2D(u, v);
+                          
+                          alpha = (-(xpix - x1) * (y2 - y1) + (ypix + 1. / srs - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
+                          beta = (-(xpix - x2) * (y0 - y2) + (ypix + 1. / srs - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
+                          gamma = 1 - alpha - beta;
+                          u = alpha * u0 + beta * u1 + gamma * u2;
+                          v = alpha * v0 + beta * v1 + gamma * v2;
+                          sp.p_dy_uv = Vector2D(u, v);
+                          
                           c = tex.sample(sp);
                           fill_pixel(srs * x + i, srs * y + j, c);
                       }
