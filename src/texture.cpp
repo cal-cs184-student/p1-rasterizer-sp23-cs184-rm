@@ -58,7 +58,7 @@ namespace CGL {
           }
 //          Color c1 = sample_nearest(sp.p_uv, floorValue);
 //          Color c2 = sample_nearest(sp.p_uv, topValue);
-          Color c = w1 * c1 + w2 * c2;
+          Color c = w2 * c1 + w1 * c2;
           return c;
       }
   }
@@ -78,12 +78,12 @@ namespace CGL {
       float level;
 
       Vector2D duv = sp.p_dx_uv - sp.p_uv; //difference vector
-      duv.x = duv.x * width; //scale
-      duv.y = duv.y * height; //scale
+      duv.x = duv.x * (width - 1); //scale
+      duv.y = duv.y * (height - 1); //scale
 
       Vector2D dvu = sp.p_dy_uv - sp.p_uv; //difference vector
-      dvu.x = dvu.x * width;  //scale
-      dvu.y = dvu.y * height; //scale
+      dvu.x = dvu.x * (width - 1);  //scale
+      dvu.y = dvu.y * (height - 1); //scale
 
       max = std::max(duv.norm(), dvu.norm());
       level = std::max(0.f, std::log2(max));
@@ -102,7 +102,7 @@ namespace CGL {
           // return magenta for invalid level
           return Color(1, 0, 1);
       }
-      return mip.get_texel(round(uv.x * (mip.width - 1)), round(uv.y * (mip.height - 1)));
+      return mip.get_texel(round(uv.x * (mip.width - 1.)), round(uv.y * (mip.height - 1.)));
   }
 
   Color Texture::sample_bilinear(Vector2D uv, int level) {
@@ -112,13 +112,13 @@ namespace CGL {
           // return magenta for invalid level
           return Color(1, 0, 1);
       }
-      float x1 = floor(uv.x * (mip.width - 1));
-      float x2 = ceil(uv.x * (mip.width - 1));
-      float y1 = floor(uv.y * (mip.height - 1));
-      float y2 = ceil(uv.y * (mip.height - 1));
-      float s = (uv.x * (mip.width - 1)) - x1;
+      float x1 = floor(uv.x * (mip.width - 1.));
+      float x2 = ceil(uv.x * (mip.width - 1.));
+      float y1 = floor(uv.y * (mip.height - 1.));
+      float y2 = ceil(uv.y * (mip.height - 1.));
+      float s = (uv.x * (mip.width - 1.)) - x1;
       float sm = 1 - s;
-      float t = (uv.y * (mip.height - 1)) - y1;
+      float t = (uv.y * (mip.height - 1.)) - y1;
       float tm = 1 - t;
       Color a = mip.get_texel(x1, y1);
       Color b = mip.get_texel(x2, y1);

@@ -110,12 +110,8 @@ namespace CGL {
       int srs = (int) sqrt(sample_rate);
       float xpix;
       float ypix;
-      float s_width = width * srs;
-      for (int x = xmin; x < xmax; x++) {
-          for (int y = ymin; y < ymax; y++) {
-              float red = 0;
-              float blue = 0;
-              float green = 0;
+      for (int x = xmin; x <= xmax; x++) {
+          for (int y = ymin; y <= ymax; y++) {
               for (int i = 0; i < srs; i++) {
                   for (int j = 0; j < srs; j++) {
                       xpix = x + (i+0.5)/srs;
@@ -207,11 +203,8 @@ namespace CGL {
       float xpix;
       float ypix;
       float s_width = width * srs;
-      for (int x = xmin; x < xmax; x++) {
-          for (int y = ymin; y < ymax; y++) {
-              float red = 0;
-              float blue = 0;
-              float green = 0;
+      for (int x = xmin; x <= xmax; x++) {
+          for (int y = ymin; y <= ymax; y++) {
               for (int i = 0; i < srs; i++) {
                   for (int j = 0; j < srs; j++) {
                       xpix = x + (i+0.5)/srs;
@@ -219,7 +212,7 @@ namespace CGL {
                       if (pointinside(xpix, ypix, x0, y0, x1, y1, x2, y2) == 1) {
                           float alpha = (-(xpix - x1) * (y2 - y1) + (ypix - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
                           float beta = (-(xpix - x2) * (y0 - y2) + (ypix - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
-                          float gamma = 1 - alpha - beta;
+                          float gamma = 1. - alpha - beta;
                           float u = alpha * u0 + beta * u1 + gamma * u2;
                           float v = alpha * v0 + beta * v1 + gamma * v2;
                           sp.p_uv = Vector2D(u, v);
@@ -230,7 +223,7 @@ namespace CGL {
                           u = alpha * u0 + beta * u1 + gamma * u2;
                           v = alpha * v0 + beta * v1 + gamma * v2;
                           sp.p_dx_uv = Vector2D(u, v);
-                          
+
                           alpha = (-(xpix - x1) * (y2 - y1) + (ypix + 1. / srs - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
                           beta = (-(xpix - x2) * (y0 - y2) + (ypix + 1. / srs - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
                           gamma = 1 - alpha - beta;
