@@ -80,7 +80,7 @@ namespace CGL {
       float L1 = -1 * (x - x1) * (y2 - y1) + (y - y1) * (x2 - x1);
       float L2 = -1 * (x - x2) * (y0 - y2) + (y - y2) * (x0 - x2);
       
-      if ((L0 > 0) && (L1 > 0) && (L2 > 0)) {
+      if ((L0 >= 0) && (L1 >= 0) && (L2 >= 0)) {
           return 1;
       } else if ((L0 < 0) && (L1 < 0) && (L2 < 0)) {
           return 1;

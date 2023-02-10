@@ -20,25 +20,44 @@ namespace CGL {
       float lev = get_level(sp); //curr level
       float topValue;
       float floorValue;
+      Color c1;
+      Color c2;
 
       if (lev >= mipmap.size()){
           return Color(1, 0, 1);
       }
 
       if (sp.lsm == L_ZERO){
-          return sample_nearest(sp.p_uv, 0);
+          if (sp.psm == P_NEAREST) {
+              return sample_nearest(sp.p_uv, 0);
+          } else if (sp.psm == P_LINEAR) {
+              return sample_bilinear(sp.p_uv, 0);
+          }
       }
       else if (sp.lsm == L_NEAREST){
-          int lev = get_level(sp);
-          return sample_nearest(sp.p_uv, lev);
+//          int lev = get_level(sp);
+//          return sample_nearest(sp.p_uv, lev);
+          lev = round(lev);
+          if (sp.psm == P_NEAREST) {
+              return sample_nearest(sp.p_uv, lev);
+          } else if (sp.psm == P_LINEAR) {
+              return sample_bilinear(sp.p_uv, lev);
+          }
       }
       else if (sp.lsm == L_LINEAR){
           topValue = ceil(lev);
           floorValue = floor(lev);
           float w1 = topValue - lev;
           float w2 = lev - floorValue;
-          Color c1 = sample_nearest(sp.p_uv, floorValue);
-          Color c2 = sample_nearest(sp.p_uv, topValue);
+          if (sp.psm == P_NEAREST) {
+              c1 = sample_nearest(sp.p_uv, floorValue);
+              c2 = sample_nearest(sp.p_uv, topValue);
+          } else if (sp.psm == P_LINEAR) {
+              c1 = sample_bilinear(sp.p_uv, floorValue);
+              c2 = sample_bilinear(sp.p_uv, topValue);
+          }
+//          Color c1 = sample_nearest(sp.p_uv, floorValue);
+//          Color c2 = sample_nearest(sp.p_uv, topValue);
           Color c = w1 * c1 + w2 * c2;
           return c;
       }
