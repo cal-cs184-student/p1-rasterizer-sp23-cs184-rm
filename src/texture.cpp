@@ -8,7 +8,8 @@ namespace CGL {
 
   Color Texture::sample(const SampleParams& sp) {
     // TODO: Task 6: Fill this in.
-      float level = get_level(sp);
+//      float level = round(get_level(sp)); // need to change this to do level sampling
+      float level = 0;
       if (sp.psm == P_NEAREST) {
           return sample_nearest(sp.p_uv, level);
       } else if (sp.psm == P_LINEAR) {
@@ -27,7 +28,7 @@ namespace CGL {
       float val1 = sqrt(pow(sp.p_dx_uv[0], 2) + pow(sp.p_dx_uv[1], 2));
       float val2 = sqrt(pow(sp.p_dy_uv[0], 2) + pow(sp.p_dy_uv[1], 2));
       float L = max(val1, val2);
-      float D = log(L) / log(2);
+      float D = log2(L);
       return D;
   }
 
