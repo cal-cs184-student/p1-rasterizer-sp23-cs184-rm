@@ -9,27 +9,67 @@ namespace CGL {
   Color Texture::sample(const SampleParams& sp) {
     // TODO: Task 6: Fill this in.
 //      float level = round(get_level(sp)); // need to change this to do level sampling
-      float level = 0;
-      if (sp.psm == P_NEAREST) {
-          return sample_nearest(sp.p_uv, level);
-      } else if (sp.psm == P_LINEAR) {
-          return sample_bilinear(sp.p_uv, level);
+//      float level = 0;
+//      if (sp.psm == P_NEAREST) {
+//          return sample_nearest(sp.p_uv, level);
+//      } else if (sp.psm == P_LINEAR) {
+//          return sample_bilinear(sp.p_uv, level);
+//      }
+//
+
+      float lev = get_level(sp); //curr level
+      float topValue;
+      float floorValue;
+
+      if (lev >= mipmap.size()){
+          return Color(1, 0, 1);
       }
 
-// return magenta for invalid level
-    return Color(1, 0, 1);
+      if (sp.lsm == L_ZERO){
+          return sample_nearest(sp.p_uv, 0);
+      }
+      else if (sp.lsm == L_NEAREST){
+          int lev = get_level(sp);
+          return sample_nearest(sp.p_uv, lev);
+      }
+      else if (sp.lsm == L_LINEAR){
+          topValue = ceil(lev);
+          floorValue = floor(lev);
+          float w1 = topValue - lev;
+          float w2 = lev - floorValue;
+          Color c1 = sample_nearest(sp.p_uv, floorValue);
+          Color c2 = sample_nearest(sp.p_uv, topValue);
+          Color c = w1 * c1 + w2 * c2;
+          return c;
+      }
   }
 
   float Texture::get_level(const SampleParams& sp) {
     // TODO: Task 6: Fill this in.
-      if (sp.p_dx_uv[0] == 0 && sp.p_dx_uv[1] == 0) {
-          return 0;
-      }
-      float val1 = sqrt(pow(sp.p_dx_uv[0], 2) + pow(sp.p_dx_uv[1], 2));
-      float val2 = sqrt(pow(sp.p_dy_uv[0], 2) + pow(sp.p_dy_uv[1], 2));
-      float L = max(val1, val2);
-      float D = log2(L);
-      return D;
+//      if (sp.p_dx_uv[0] == 0 && sp.p_dx_uv[1] == 0) {
+//          return 0;
+//      }
+//      float val1 = sqrt(pow(sp.p_dx_uv[0], 2) + pow(sp.p_dx_uv[1], 2));
+//      float val2 = sqrt(pow(sp.p_dy_uv[0], 2) + pow(sp.p_dy_uv[1], 2));
+//      float L = max(val1, val2);
+//      float D = log2(L);
+//      return D;
+
+      float max;
+      float level;
+
+      Vector2D duv = sp.p_dx_uv - sp.p_uv; //difference vector
+      duv.x = duv.x * width; //scale
+      duv.y = duv.y * height; //scale
+
+      Vector2D dvu = sp.p_dy_uv - sp.p_uv; //difference vector
+      dvu.x = dvu.x * width;  //scale
+      dvu.y = dvu.y * height; //scale
+
+      max = std::max(duv.norm(), dvu.norm());
+      level = std::max(0.f, std::log2(max));
+
+      return level;
   }
 
   Color MipLevel::get_texel(int tx, int ty) {
