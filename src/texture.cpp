@@ -23,9 +23,9 @@ namespace CGL {
       Color c1;
       Color c2;
 
-      if (lev >= mipmap.size()){
-          return Color(1, 0, 1);
-      }
+//      if (lev >= mipmap.size()){
+//          return Color(1, 0, 1);
+//      }
 
       if (sp.lsm == L_ZERO){
           if (sp.psm == P_NEAREST) {
@@ -38,6 +38,9 @@ namespace CGL {
 //          int lev = get_level(sp);
 //          return sample_nearest(sp.p_uv, lev);
           lev = round(lev);
+          if (lev >= mipmap.size()) {
+              lev = mipmap.size() - 1;
+          }
           if (sp.psm == P_NEAREST) {
               return sample_nearest(sp.p_uv, lev);
           } else if (sp.psm == P_LINEAR) {
@@ -49,6 +52,13 @@ namespace CGL {
           floorValue = floor(lev);
           float w1 = topValue - lev;
           float w2 = lev - floorValue;
+          if (topValue >= mipmap.size() || (w1 + w2) == 0) {
+              if (sp.psm == P_NEAREST) {
+                  return sample_nearest(sp.p_uv, floorValue);
+              } else if (sp.psm == P_LINEAR) {
+                  return sample_bilinear(sp.p_uv, floorValue);
+              }
+          }
           if (sp.psm == P_NEAREST) {
               c1 = sample_nearest(sp.p_uv, floorValue);
               c2 = sample_nearest(sp.p_uv, topValue);
@@ -58,7 +68,7 @@ namespace CGL {
           }
 //          Color c1 = sample_nearest(sp.p_uv, floorValue);
 //          Color c2 = sample_nearest(sp.p_uv, topValue);
-          Color c = w2 * c1 + w1 * c2;
+          Color c = (w2 * c1) + (w1 * c2);
           return c;
       }
   }
@@ -98,7 +108,7 @@ namespace CGL {
   Color Texture::sample_nearest(Vector2D uv, int level) {
     // TODO: Task 5: Fill this in.
     auto& mip = mipmap[level];
-      if (level > 7 || level < 0) {
+      if (level >= mipmap.size() || level < 0) {
           // return magenta for invalid level
           return Color(1, 0, 1);
       }
@@ -108,7 +118,7 @@ namespace CGL {
   Color Texture::sample_bilinear(Vector2D uv, int level) {
       // TODO: Task 5: Fill this in.
       auto& mip = mipmap[level];
-      if (level > 7 || level < 0) {
+      if (level >= mipmap.size() || level < 0) {
           // return magenta for invalid level
           return Color(1, 0, 1);
       }
@@ -124,13 +134,13 @@ namespace CGL {
       Color b = mip.get_texel(x2, y1);
       Color c = mip.get_texel(x1, y2);
       Color d = mip.get_texel(x2, y2);
-      Color e = Color (a.r * sm + b.r * s, a.g * sm + b.g * s, a.b * sm + b.b * s);
-      Color f = Color (c.r * sm + d.r * s, c.g * sm + d.g * s, c.b * sm + d.b * s);
-      return Color (e.r * tm + f.r * t, e.g * tm + f.g * t, e.b * tm + f.b * t);
-//      Color e = a + s * (b + (-1 * a));
-//      Color f = c + s * (d + (-1 * c));
-//      Color p = e + t * (f + (-1 * e));
-//      return p;
+//      Color e = Color (a.r * sm + b.r * s, a.g * sm + b.g * s, a.b * sm + b.b * s);
+//      Color f = Color (c.r * sm + d.r * s, c.g * sm + d.g * s, c.b * sm + d.b * s);
+//      return Color (e.r * tm + f.r * t, e.g * tm + f.g * t, e.b * tm + f.b * t);
+      Color e = a + s * (b + (-1 * a));
+      Color f = c + s * (d + (-1 * c));
+      Color p = e + t * (f + (-1 * e));
+      return p;
   }
 
 

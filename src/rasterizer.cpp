@@ -217,19 +217,19 @@ namespace CGL {
                           float v = alpha * v0 + beta * v1 + gamma * v2;
                           sp.p_uv = Vector2D(u, v);
                           
-                          alpha = (-((xpix + 1. / srs) - x1) * (y2 - y1) + (ypix - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
-                          beta = (-((xpix + 1. / srs) - x2) * (y0 - y2) + (ypix - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
-                          gamma = 1 - alpha - beta;
-                          u = alpha * u0 + beta * u1 + gamma * u2;
-                          v = alpha * v0 + beta * v1 + gamma * v2;
-                          sp.p_dx_uv = Vector2D(u, v);
+                          float alpha1 = (-((xpix + 1.) - x1) * (y2 - y1) + (ypix - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
+                          float beta1 = (-((xpix + 1.) - x2) * (y0 - y2) + (ypix - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
+                          float gamma1 = 1. - alpha1 - beta1;
+                          float uu = alpha1 * u0 + beta1 * u1 + gamma1 * u2;
+                          float vv = alpha1 * v0 + beta1 * v1 + gamma1 * v2;
+                          sp.p_dx_uv = Vector2D(uu, vv);
 
-                          alpha = (-(xpix - x1) * (y2 - y1) + (ypix + 1. / srs - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
-                          beta = (-(xpix - x2) * (y0 - y2) + (ypix + 1. / srs - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
-                          gamma = 1 - alpha - beta;
-                          u = alpha * u0 + beta * u1 + gamma * u2;
-                          v = alpha * v0 + beta * v1 + gamma * v2;
-                          sp.p_dy_uv = Vector2D(u, v);
+                          float alpha2 = (-(xpix - x1) * (y2 - y1) + (ypix + 1. - y1) * (x2 - x1)) / (-(x0 - x1) * (y2 - y1) + (y0 - y1) * (x2 - x1));
+                          float beta2 = (-(xpix - x2) * (y0 - y2) + (ypix + 1. - y2) * (x0 - x2)) / (-(x1 - x2) * (y0 - y2) + (y1 - y2) * (x0 - x2));
+                          float gamma2 = 1. - alpha2 - beta2;
+                          float uuu = alpha2 * u0 + beta2 * u1 + gamma2 * u2;
+                          float vvv = alpha2 * v0 + beta2 * v1 + gamma2 * v2;
+                          sp.p_dy_uv = Vector2D(uuu, vvv);
                           
                           c = tex.sample(sp);
                           fill_pixel(srs * x + i, srs * y + j, c);
